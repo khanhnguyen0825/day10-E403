@@ -1,61 +1,44 @@
-# Báo Cáo Cá Nhân — Lab Day 10: Data Pipeline & Observability
+# Báo cáo cá nhân — Lab Day 10
 
-**Họ và tên:** Nguyễn Thành Đại Khánh 
-**Vai trò:** Ingestion & Cleaning - Sprint 1
-**Ngày nộp:** 15-04-2026
-
----
-
-## 1. Tôi phụ trách phần nào?
-
-**File / module:**
-- `transform/cleaning_rules.py`: Tác giả chính của 3 rule làm sạch mới: `missing_exported_at`, Strip HTML tags/Internal notes bằng Regex, và Threshold lọc chunk quá ngắn `chunk_too_short`.
-- `docs/data_contract.md`: Điền Source Map (định nghĩa Data source từ IT Helpdesk và HR System, cảnh báo Failure Modes).
-- `contracts/data_contract.yaml`: Điền thông tin Ownership (Data Engineering Team) và gán `freshness_hours: 24` cho SLA.
-- `data/raw/policy_export_dirty.csv`: Injection thêm 3 dòng dữ liệu bẩn để test pipeline.
-
-**Kết nối với thành viên khác:**
-Code làm sạch của tôi chuẩn hóa bảng dữ liệu thô đầu vào, cung cấp đầu ra `cleaned_sprint1.csv` đủ sạch để Thành viên 2 viết `expectations.py` (Validation) và Thành viên 3 đánh giá hệ thống (Monitor/Eval). 
-
-**Bằng chứng (commit / comment trong code):**
-Đoạn mã tôi đã viết nằm trong hàm `clean_rows` của `cleaning_rules.py`, xử lý loại bỏ HTML tags `_HTML_TAGS.sub("", text).strip()` và bắt điều kiện `# --- Rule 4: Chunk too short ---`.
+**Họ và tên:** Nguyễn Thành Đại Khánh
+**Vai trò:** Ingestion & Cleaning Owner
+**Độ dài:** ~490 từ
 
 ---
 
-## 2. Một quyết định kỹ thuật
+## 1. Phụ trách
 
-**Quy tắc Quarantine vs Drop thay vì báo lỗi (Halt):**
-Khi làm sạch nội dung, nhóm tôi gặp phải một dòng dữ liệu chứa Script thẻ bẩn: `<script>alert(1)</script>`. Thay vì bắt Expectation và báo `halt` để dừng đứng toàn bộ quá trình ETL (việc này sẽ làm gián đoạn pipeline thực tế chạy ban đêm), tôi quyết định dùng Regex để gỡ bỏ (Strip) hoàn toàn đoạn Script đó ra khỏi văn bản. 
+Tôi phụ trách nhóm code làm sạch trong 	ransform/cleaning_rules.py (tạo 3 rules mới: missing_exported_at, làm sạch tag HTML và quarantine các chunk_text quá ngắn). Đầu ra sau khi clean (cleaned_records) và các dòng bị vứt bỏ (quarantine_records) được liên kết với file log để Thành viên 2 và 3 xây dựng Expectations và theo dõi Freshness.
+Tôi cũng trực tiếp mở rộng docs/data_contract.md (khai báo Data source map) và điền SLA vào contracts/data_contract.yaml.
 
-Tuy nhiên, tôi nhận thấy có những trường hợp sau khi gỡ code bẩn, nội dung văn bản còn lại không có giá trị hoặc quá ngắn (dưới 15 ký tự). Do đó, tôi viết thêm quyết định chặn 2 lớp: "Nếu gỡ xong mà văn bản nhỏ hơn 15 ký tự, nó sẽ bị chuyển vào thư mục Archive Quarantine với mã lỗi `chunk_too_short` chứ không bị drop hoặc báo lỗi ra ngoài". Điều này giữ cho Pipeline an toàn, chạy thông suốt mà vẫn bảo tồn tối đa các chunk hữu ích còn lưu lại.
-
----
-
-## 3. Một lỗi hoặc anomaly đã xử lý 
-
-**Mô tả triệu chứng:** Trong quá trình chạy thử Rule cắt HTML, có một anomaly xảy ra là một số nội dung chỉ chứa rác hoặc câu chữ vớ vẩn. Lúc đầu regex cắt sạch luôn làm chuỗi `text` trở thành `Empty` (Rỗng). Pipeline lúc chưa được fix đã đẩy dòng rỗng này đi tiếp xuống khâu Embed, gây tốn tài nguyên ChromaDB vô ích và làm nhiễu kết quả Retrieval.
-
-**Fix và Metric phát hiện:** Tôi đã bổ sung thêm cờ kiểm tra kép vào hàm `clean_rows`. Sau lệnh stripped nội dung, hệ thống sẽ chạy 1 khối `if not text:` để quét. Nếu text bằng rỗng, nó lập tức gán `reason`: `missing_chunk_text_after_html_strip` và đẩy vào `quarantine`. 
-
-**Bằng chứng (Trích Log):** 
-Metric đã phát hiện chính xác, log in ra: `run_id=sprint1 | raw_records=13 | cleaned_records=7 | quarantine_records=6`. Phân hệ làm sạch đã hoàn thành xuất sắc nhiệm vụ bảo vệ dữ liệu.
+**Bằng chứng:** Xem các commit chứa đoạn regex _HTML_TAGS và điều kiện chunk_too_short trong logic clean_rows (sprint 1).
 
 ---
 
-## 4. Bằng chứng trước / sau
+## 2. Quyết định kỹ thuật
 
-Quá trình làm sạch của tôi đã bảo đảm Pipeline không thu nạp các dòng rác và giữ lại đủ nội dung giá trị. Dưới đây là trích log Terminal của `run_id=sprint1` chứng minh pipeline đầu cuối Ingest & Clean hoạt động ổn định trước khi chuyển giao cho khâu Validation của Thành viên 2:
+**Quarantine vs Drop (Halt):** Trong luồng xử lý văn bản chứa HTML bẩn <script>alert(1)</script>, thay vì đẩy ra lỗi halt để dừng đứng toàn bộ quá trình ETL (tránh downtime lúc đang chạy nightly batch), tôi quyết định dùng Regex loại bỏ HTML.
+Tuy nhiên, nếu văn bản sau khi bóc thẻ HTML trở nên quá ngắn (<15 ký tự) và mất ý nghĩa, nó sẽ tự động bị ném vào thư mục lưu trữ rtifacts/quarantine/ với lý do chunk_too_short thay vì bị ngầm xoá bỏ. Quyết định này giúp giữ luồng dữ liệu liên tục và vẫn rà soát lại (audit) được dữ liệu.
 
-```text
-run_id=sprint1
-raw_records=13
-cleaned_records=7
-quarantine_records=6
-cleaned_csv=artifacts\cleaned\cleaned_sprint1.csv
-quarantine_csv=artifacts\quarantine\quarantine_sprint1.csv
-expectation[min_one_row] OK (halt) :: cleaned_rows=7
-```
-(Dòng chứa HTML bẩn `Xin hãy gửi yêu cầu vào support@example.com để biết thêm chi tiết. <script>alert(1)</script>` đã được bóc tách và chunk ID 13 đã nạp an toàn).
+---
+
+## 3. Sự cố / anomaly
+
+**Triệu chứng:** Khi thử nghiệm regex cắt tag HTML và các note nội bộ như (ghi chú: ...), có một số dòng nguyên gốc chỉ chứa rác, nên cắt xong thì biến thành chuỗi rỗng (Empty text). 
+Ban đầu pipeline vẫn đẩy các dòng rỗng này đi tiếp xuống khâu Embed, gây rác tốn tài nguyên VectorDB.
+
+**Fix:** Tôi đã bổ sung kiểm tra kép if not text: ngay sau lệnh .strip(). Nếu text bằng rỗng sau khi xử lý, dòng đó sẽ vào Quarantine với cờ missing_chunk_text_after_html_strip.
+Log bắt đầu báo chính xác: quarantine_records nhận đúng những dòng này.
+
+---
+
+## 4. Before/after
+
+**Log:** Trước khi có rule, script HTML chui tọt vào DB. Sau khi làm sạch chuẩn ở run sprint1: 
+aw_records=13, cleaned_records=7, quarantine_records=6.
+Tất cả các chunk độc hại và chunk rỗng exported_at đều bị drop khỏi collection ở pipeline sạch.
+
+**CSV:** Trong rtifacts/eval/before_after_eval.csv, không còn xuất hiện các dòng HTML hay văn bản trống không làm nhiễu kết quả Retrieval.
 
 ---
 
