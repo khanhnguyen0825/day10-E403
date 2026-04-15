@@ -1,7 +1,17 @@
+.env
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.vscode/
+.idea/
 .DS_Store
 *.swp
 *~
-
+# Database
+chroma_db/
+day08/lab/chroma_db/
+day09/lab/chroma_db/
 # Grading questions — không public trước 17:00
 day08/lab/data/grading_questions.json
 day09/lab/data/grading_questions.json
