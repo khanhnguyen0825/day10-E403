@@ -1,0 +1,15 @@
+{
+  "run_id": "sprint2_member2",
+  "run_timestamp": "2026-04-15T05:13:34.799814+00:00",
+  "raw_path": "data/raw/policy_export_dirty.csv",
+  "raw_records": 13,
+  "cleaned_records": 11,
+  "quarantine_records": 2,
+  "cleaned_csv": "artifacts/cleaned/cleaned_sprint2_member2.csv",
+  "quarantine_csv": "artifacts/quarantine/quarantine_sprint2_member2.csv",
+  "expectations_total": 8,
+  "expectations_passed": 5,
+  "expectations_failed": 3,
+  "halt": true,
+  "chroma_collection": "day10_kb"
+}

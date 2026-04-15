@@ -1,0 +1,12 @@
+chunk_id,doc_id,chunk_text,effective_date,exported_at
+policy_refund_v4_0_a26bcb34bb8dad3e,policy_refund_v4,Yêu cầu được gửi trong vòng 7 ngày làm việc kể từ thời điểm xác nhận đơn hàng.,2026-02-01,2026-04-10T08:00:00
+policy_refund_v4_1_3b11f30cc4b49d25,policy_refund_v4,Yêu cầu được gửi trong vòng 7 ngày làm việc kể từ thời điểm xác nhận đơn hàng.,2026-02-01,2026-04-10T08:00:00
+policy_refund_v4_2_45eb043f3cd16916,policy_refund_v4,Yêu cầu hoàn tiền được chấp nhận trong vòng 14 ngày làm việc kể từ xác nhận đơn (ghi chú: bản sync cũ policy-v3 — lỗi migration).,2026-02-01,2026-04-10T08:00:00
+sla_p1_2026_3_ab622211ba880896,sla_p1_2026,Ticket P1 có SLA phản hồi ban đầu 15 phút và resolution trong 4 giờ.,2026-02-01,2026-04-10T08:00:00
+it_helpdesk_faq_5_55712a6bb4f63599,it_helpdesk_faq,Tài khoản bị khóa sau 5 lần đăng nhập sai liên tiếp.,2026-02-01,2026-04-10T08:00:00
+hr_leave_policy_6_12f917a1a9ba00c1,hr_leave_policy,Nhân viên dưới 3 năm kinh nghiệm được 10 ngày phép năm (bản HR 2025).,2025-01-01,2026-04-10T08:00:00
+hr_leave_policy_7_0db4600f80d1af71,hr_leave_policy,Nhân viên dưới 3 năm kinh nghiệm được 12 ngày phép năm theo chính sách 2026.,2026-02-01,2026-04-10T08:00:00
+it_helpdesk_faq_9_0f42c6d45e58f951,it_helpdesk_faq,FAQ bổ sung: đổi mật khẩu qua portal self-service có thể mất tối đa 24 giờ để đồng bộ toàn hệ thống.,01/02/2026,2026-04-10T08:00:00
+it_helpdesk_faq_10_7b2697b1ef8042dd,it_helpdesk_faq,Lỗi mạng,2026-02-01,2026-04-10T08:00:00
+sla_p1_2026_11_4aad21547109dfe7,sla_p1_2026,Ticket P2 SLA là 8 giờ,2026-02-01,
+policy_refund_v4_12_32aa998b8cb58279,policy_refund_v4,Xin hãy gửi yêu cầu vào support@example.com để biết thêm chi tiết. <script>alert(1)</script>,2026-02-01,2026-04-10T08:00:00

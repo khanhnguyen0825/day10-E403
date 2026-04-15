@@ -1,0 +1,3 @@
+chunk_id,doc_id,chunk_text,effective_date,exported_at
+5,policy_refund_v4,,,2026-04-10T08:00:00
+9,legacy_catalog_xyz_zzz,Chunk nội dung đủ dài để vượt ngưỡng expectation độ dài tối thiểu trong cleaned export.,2026-02-01,2026-04-10T08:00:00
