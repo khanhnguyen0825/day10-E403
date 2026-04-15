@@ -8,7 +8,8 @@
 
 | Nguồn | Phương thức ingest | Failure mode chính | Metric / alert |
 |-------|-------------------|-------------------|----------------|
-| … | … | … | … |
+| **IT Helpdesk Portal** | Export định kỳ (Batch CSV) mỗi ngày 1 lần | Tag HTML bẩn, thiếu trường exported_at, data bị rỗng | Tỉ lệ lỗi format > 5% / Cảnh báo Slack |
+| **HR System (Leave Policy)** | Push API thời gian thực vào data lake | Lệch version chính sách (bản cũ 2025 vs bản mới 2026) | Số lượng records quarantine do hiệu lực cũ > 0 |
 
 ---
 

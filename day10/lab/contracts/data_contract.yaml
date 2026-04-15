@@ -3,7 +3,11 @@
 
 version: "1.0"
 dataset: "kb_chunk_export"
-owner_team: "__TODO__"
+owner_team: "Data Engineering Team (Member 1)"
+
+service_level_agreement:
+  freshness_hours: 24
+  availability: 99.9
 
 schema_cleaned:
   chunk_id:
