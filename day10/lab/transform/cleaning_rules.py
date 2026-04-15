@@ -25,7 +25,8 @@ ALLOWED_DOC_IDS = frozenset(
 
 _ISO_DATE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _DMY_SLASH = re.compile(r"^(\d{2})/(\d{2})/(\d{4})$")
-
+_HTML_TAGS = re.compile(r"<[^>]+>")
+_INTERNAL_NOTES = re.compile(r"\(ghi chú:.*?\)|\[Lưu ý:.*?\]")
 
 def _norm_text(s: str) -> str:
     return " ".join((s or "").strip().split()).lower()
@@ -111,8 +112,30 @@ def clean_rows(
             )
             continue
 
+        # --- Rule 1: Missing exported_at ---
+        if not exported_at:
+            quarantine.append({**raw, "reason": "missing_exported_at"})
+            continue
+
         if not text:
             quarantine.append({**raw, "reason": "missing_chunk_text"})
+            continue
+
+        # --- Rule 2: Strip HTML Tags (Clean) ---
+        if _HTML_TAGS.search(text):
+            text = _HTML_TAGS.sub("", text).strip()
+            # If after stripping it's empty
+            if not text:
+                quarantine.append({**raw, "reason": "missing_chunk_text_after_html_strip"})
+                continue
+
+        # --- Rule 3: Strip internal notes (Clean) ---
+        if _INTERNAL_NOTES.search(text):
+            text = _INTERNAL_NOTES.sub("", text).strip()
+
+        # --- Rule 4: Chunk too short (Quarantine) ---
+        if len(text) < 15:
+            quarantine.append({**raw, "reason": "chunk_too_short"})
             continue
 
         key = _norm_text(text)
