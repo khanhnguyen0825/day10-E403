@@ -112,5 +112,35 @@ def run_expectations(cleaned_rows: List[Dict[str, Any]]) -> Tuple[List[Expectati
         )
     )
 
+    # E7 (NEW - halt): chunk_id không được phép NULL/rỗng — cốt lõi cho idempotent embed & tracking
+    # Nếu chunk_id bị lỗi, không thể upsert đúng vào ChromaDB → duplicate vector hoặc lost data
+    null_chunk_ids = [r for r in cleaned_rows if not (r.get("chunk_id") or "").strip()]
+    ok7 = len(null_chunk_ids) == 0
+    results.append(
+        ExpectationResult(
+            "chunk_id_not_null",
+            ok7,
+            "halt",
+            f"null_chunk_id_count={len(null_chunk_ids)}",
+        )
+    )
+
+    # E8 (NEW - warn): metadata_completeness — cảnh báo khi doc_id hoặc effective_date thiếu
+    # Không dừng pipeline nhưng log để tracking data quality. Impact: subset rows thiếu ngữ cảnh search.
+    incomplete_meta = [
+        r
+        for r in cleaned_rows
+        if not (r.get("doc_id") or "").strip() or not (r.get("effective_date") or "").strip()
+    ]
+    ok8 = len(incomplete_meta) == 0
+    results.append(
+        ExpectationResult(
+            "metadata_fields_complete",
+            ok8,
+            "warn",
+            f"rows_with_incomplete_metadata={len(incomplete_meta)}",
+        )
+    )
+
     halt = any(not r.passed and r.severity == "halt" for r in results)
     return results, halt
